@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build Your Own AI Assistant (Flask)</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f7f7fb;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      font-weight: 600;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .notice {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      margin: 10px 0;
+    }
+
+    pre {
+      background: #0b1020;
+      color: #e5e7eb;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #e5e7eb;
+      margin: 18px 0;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .radio-group label {
+      display: inline-block;
+      font-weight: 500;
+      margin-right: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Build Your Own AI Assistant (Web)</h1>
+
+    {% if error %}
+      <div class="notice"><strong>{{ error }}</strong></div>
+    {% endif %}
+
+    <h2>Choose a function</h2>
+    <form method="post" action="/generate">
+      <div class="row">
+        <div>
+          <label for="taskSelect">Function:</label>
+          <select id="taskSelect" name="task" required>
+            <option value="">-- Select --</option>
+            <option value="question" {% if result and result.task == 'question' %}selected{% endif %}>Answer a Question</option>
+            <option value="summary" {% if result and result.task == 'summary' %}selected{% endif %}>Summarize Text</option>
+            <option value="creative" {% if result and result.task == 'creative' %}selected{% endif %}>Generate Creative Content</option>
+          </select>
+        </div>
+
+        <div id="creativeTypeWrapper">
+          <label for="creativeTypeInput">Creative type (only for creative):</label>
+          <input
+            id="creativeTypeInput"
+            name="creative_type"
+            placeholder="story / poem / idea"
+            value="{% if result %}{{ result.creative_type }}{% endif %}"
+          />
+        </div>
+
+        <div>
+          <label for="userInput">Your input:</label>
+          <textarea id="userInput" name="user_input" rows="6" placeholder="Type here...">{% if result %}{{ result.user_input }}{% endif %}</textarea>
+        </div>
+      </div>
+
+      <br />
+      <button type="submit">Generate</button>
+    </form>
+
+    {% if result %}
+      <hr />
+      <h2>AI Response</h2>
+
+      <p><strong>Task:</strong> {{ result.task }}</p>
+
+      <h3>Output</h3>
+      <pre>{{ result.response }}</pre>
+
+      <h3>Feedback</h3>
+      <form method="post" action="/feedback">
+        <!-- Hidden fields so we can store feedback along with the interaction -->
+        <input type="hidden" name="task" value="{{ result.task }}" />
+        <input type="hidden" name="creative_type" value="{{ result.creative_type }}" />
+        <input type="hidden" name="user_input" value="{{ result.user_input }}" />
+        <input type="hidden" name="assistant_response" value="{{ result.response }}" />
+
+        <p>Was this response helpful? (yes/no)</p>
+        <div class="radio-group">
+          <label><input type="radio" name="helpful" value="yes" required /> yes</label>
+          <label><input type="radio" name="helpful" value="no" required /> no</label>
+        </div>
+
+        <br />
+        <button type="submit">Submit Feedback</button>
+      </form>
+
+      <hr />
+      <details>
+        <summary>Show internal prompt (for academic explanation)</summary>
+        <pre>{{ result.prompt }}</pre>
+      </details>
+    {% endif %}
+
+    <script>
+      (function () {
+        var taskSelect = document.getElementById('taskSelect');
+        var creativeTypeWrapper = document.getElementById('creativeTypeWrapper');
+
+        function updateCreativeTypeVisibility() {
+          var isCreative = taskSelect && taskSelect.value === 'creative';
+          if (!creativeTypeWrapper) return;
+          creativeTypeWrapper.style.display = isCreative ? 'block' : 'none';
+        }
+
+        if (taskSelect) {
+          taskSelect.addEventListener('change', updateCreativeTypeVisibility);
+        }
+
+        updateCreativeTypeVisibility();
+      })();
+    </script>
+  </div>
+</body>
+</html>
