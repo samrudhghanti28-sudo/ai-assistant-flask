@@ -146,7 +146,7 @@
       <pre>{{ result.response }}</pre>
 
       <h3>Feedback</h3>
-      <form method="post" action="/feedback">
+      <form method="post" action="/feedback" id="feedbackForm">
         <!-- Hidden fields so we can store feedback along with the interaction -->
         <input type="hidden" name="task" value="{{ result.task }}" />
         <input type="hidden" name="creative_type" value="{{ result.creative_type }}" />
@@ -162,6 +162,15 @@
         <br />
         <button type="submit">Submit Feedback</button>
       </form>
+      
+      <script>
+        document.getElementById('feedbackForm').addEventListener('submit', function() {
+          // Clear the form and hide the feedback section after submission
+          setTimeout(function() {
+            window.location.href = '/';
+          }, 100);
+        });
+      </script>
 
       <hr />
       <details>
