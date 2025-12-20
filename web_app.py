@@ -21,7 +21,9 @@ State handling note:
 
 from __future__ import annotations
 
-from flask import Flask, render_template, request
+import os
+
+from flask import Flask, redirect, render_template, request, url_for
 
 from assistant_core import generate_ai_response
 from feedback_store import append_feedback
@@ -93,20 +95,12 @@ def feedback():
         }
     )
 
-    # After recording feedback, render the page again with the same result + a message.
-    return render_template(
-        "index.html",
-        result={
-            "task": task,
-            "prompt": "(Prompt hidden after feedback submission)",
-            "response": assistant_response,
-            "user_input": user_input,
-            "creative_type": creative_type or "",
-        },
-        error=f"Feedback saved: {helpful}",
-    )
+    # After recording feedback, redirect to the index page with a cleared form
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
     # debug=True is useful for academic demos (auto-reload + better error messages)
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "5000"))
+    app.run(host=host, port=port, debug=True)
