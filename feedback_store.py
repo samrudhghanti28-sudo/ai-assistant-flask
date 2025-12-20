@@ -27,7 +27,6 @@ def append_feedback(entry: Dict[str, Any]) -> None:
 
     We always add a timestamp so you can see when the feedback was recorded.
     """
-
     safe_entry = dict(entry)
     safe_entry["timestamp"] = datetime.now().isoformat(timespec="seconds")
 
@@ -40,7 +39,6 @@ def append_feedback(entry: Dict[str, Any]) -> None:
 
 def read_all_feedback(limit: int = 50) -> list[Dict[str, Any]]:
     """Read last N feedback entries (for display/debug)."""
-
     if not FEEDBACK_FILE.exists():
         return []
 
