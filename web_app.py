@@ -18,15 +18,15 @@ State handling note:
 - For simplicity (beginner-friendly), this app sends the response back to the page
   and includes hidden fields so feedback can be recorded without a database.
 """
+from flask import Flask, render_template, request, redirect, url_for
+from feedback_store import append_feedback, init_db
+from models import db
 
-from __future__ import annotations
+app = Flask(__name__)
 
-import os
+# Initialize database
+init_db(app)
 
-from flask import Flask, redirect, render_template, request, url_for
-
-from assistant_core import generate_ai_response
-from feedback_store import append_feedback
 
 
 app = Flask(__name__)
@@ -104,3 +104,4 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "5000"))
     app.run(host=host, port=port, debug=True)
+
